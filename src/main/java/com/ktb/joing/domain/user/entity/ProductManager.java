@@ -18,7 +18,8 @@ import java.util.List;
 @DiscriminatorValue(value = "ProductManager")
 public class ProductManager extends User {
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    //기획자가 삭제되면 해당 선호 카테고리도 삭제
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteCategory> favoriteCategories = new ArrayList<>();
 
     @Builder
