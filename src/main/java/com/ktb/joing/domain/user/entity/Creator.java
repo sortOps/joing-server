@@ -36,12 +36,12 @@ public class Creator extends User{
     private Category category;
 
     @Builder
-    public Creator(String nickname, String email, String profileImage,
+    public Creator(String username, String nickname, String email, String profileImage,
                    Boolean profileSetup, String socialId, Role role,
                    SocialProvider socialProvider, String channelUrl,
                    Long maxViews, Long minViews, Long subscribers,
                    Long comments, MediaType mediaType, Category category) {
-        super(nickname, email, profileImage, profileSetup, socialId, role, socialProvider);
+        super(username, nickname, email, profileImage, profileSetup, socialId, role, socialProvider);
         this.channelUrl = channelUrl;
         this.maxViews = maxViews;
         this.minViews = minViews;

@@ -11,22 +11,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 
 @Entity
 @Getter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "USER_TYPE") // 자식을 구분할 수 있는 컬럼
+@Inheritance(strategy = InheritanceType.JOINED) // 상속 전략
+@DiscriminatorColumn(name = "user_type") // 자식을 구분할 수 있는 컬럼
 public abstract class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
+
+    private String username;
 
     private String nickname;
 
@@ -47,14 +50,17 @@ public abstract class User {
     @Column(nullable = false)
     private SocialProvider socialProvider;
 
-    @Builder
-    public User(String nickname, String email,  String profileImage, Boolean profileSetup, String socialId, Role role, SocialProvider socialProvider) {
+    // 자식 클래스에서 접근 가능한 protected 생성자
+    protected User(String username, String nickname, String email, String profileImage,
+                   Boolean profileSetup, String socialId, Role role,
+                   SocialProvider socialProvider) {
+        this.username = username;
         this.nickname = nickname;
         this.email = email;
         this.profileImage = profileImage;
         this.profileSetup = profileSetup;
-        this.role = role;
         this.socialId = socialId;
+        this.role = role;
         this.socialProvider = socialProvider;
     }
 
@@ -64,6 +70,10 @@ public abstract class User {
 
     public void updateEmail(String email) {
         this.email = email;
+    }
+
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }
 

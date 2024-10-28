@@ -23,10 +23,10 @@ public class ProductManager extends User {
     private List<FavoriteCategory> favoriteCategories = new ArrayList<>();
 
     @Builder
-    public ProductManager(String nickname, String email, String profileImage,
+    public ProductManager(String username, String nickname, String email, String profileImage,
                           Boolean profileSetup, String socialId, Role role,
                           SocialProvider socialProvider) {
-        super(nickname, email, profileImage, profileSetup, socialId, role, socialProvider);
+        super(username, nickname, email, profileImage, profileSetup, socialId, role, socialProvider);
     }
 
 }
