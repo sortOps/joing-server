@@ -1,14 +1,16 @@
 package com.ktb.joing.common.config;
 
+import com.ktb.joing.domain.auth.handler.CustomSuccessHandler;
+import com.ktb.joing.domain.auth.jwt.JwtFilter;
 import com.ktb.joing.domain.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -16,6 +18,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
+    private final JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,13 +39,19 @@ public class SecurityConfig {
         http
                 .oauth2Login((oauth) -> oauth
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
-                                .userService(customOAuth2UserService)));
+                                .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler));
 
-        //경로별 인가 작업
+        // JWT 필터 설정
         http
-                .authorizeHttpRequests((auth) -> auth
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // 경로별 인가 작업
+        http.securityMatcher("/**") // 모든 요청에 대해
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated()
+                );
 
         //세션 설정 : STATELESS
         http
@@ -50,4 +60,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }
