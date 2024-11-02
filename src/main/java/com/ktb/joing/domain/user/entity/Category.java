@@ -1,38 +1,26 @@
 package com.ktb.joing.domain.user.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+public enum Category {
+    GAME("게임"),
+    TECH("과학기술"),
+    EDUCATION("교육"),
+    KNOWHOW_STYLE("노하우/스타일"),
+    NEWS_POLITICS("뉴스/정치"),
+    SPORTS("스포츠"),
+    NONPROFIT_SOCIAL("비영리/사회운동"),
+    PETS_ANIMALS("애완동물/동물"),
+    ENTERTAINMENT("엔터테인먼트"),
+    TRAVEL_EVENTS("여행/이벤트"),
+    MOVIE_ANIMATION("영화/애니메이션"),
+    MUSIC("음악"),
+    PEOPLE_BLOG("인물/블로그"),
+    AUTO_TRANSPORT("자동차/교통"),
+    COMEDY("코미디"),
+    ETC("기타");
 
-import java.util.ArrayList;
-import java.util.List;
+    private final String value;
 
-@Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
-    private Long id;
-
-    private String name;
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Creator> creators = new ArrayList<>();
-
-    @Builder
-    public Category(String name) {
-        this.name = name;
+    Category(String value) {
+        this.value = value;
     }
 }
