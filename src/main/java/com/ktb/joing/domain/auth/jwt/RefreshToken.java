@@ -1,13 +1,13 @@
 package com.ktb.joing.domain.auth.jwt;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
-@Entity
 @Getter
 @NoArgsConstructor
+@RedisHash(value = "refreshToken", timeToLive = 1209600)
 public class RefreshToken {
     @Id
     private String refreshToken;
