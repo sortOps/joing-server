@@ -29,16 +29,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private String frontUrl;
 
     private final JwtUtil jwtUtil;
-    private final CookieUtils cooKieUtils;
+    private final CookieUtils cookieUtils;
     private final TokenService tokenService;
     private final TempUserRepository tempUserRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
         //유저 정보
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
-
         String username = customUserDetails.getUsername();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -46,23 +44,35 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        // 토큰 생성
+        // Redis에 임시 데이터가 있다면 신규 회원가입 진행
+        if (tempUserRepository.findById(username).isPresent()) {
+            // 임시 회원용 토큰 생성
+            String access = jwtUtil.createTempAccessToken("access", username, role);
+            String refresh = jwtUtil.createTempRefreshToken("refresh", username, role);
+
+            // Refresh 토큰 저장
+            tokenService.saveRefreshToken(username, refresh);
+
+            // 응답 설정
+            response.setHeader("access", access);
+            response.addCookie(cookieUtils.createCookie("refresh", refresh));
+
+            response.sendRedirect(frontUrl + "/signup");
+            return;
+        }
+
+        // 정상 회원용 토큰 생성
         String access = jwtUtil.createAccessToken("access", username, role);
         String refresh = jwtUtil.createRefreshToken("refresh", username, role);
 
-        //Refresh 토큰 저장
+        // Refresh 토큰 저장
         tokenService.saveRefreshToken(username, refresh);
 
-        //응답 설정
-        response.setHeader("access", access); // 응답헤더에 엑세스 토큰
-        response.addCookie(cooKieUtils.createCookie("refresh", refresh)); // 응답쿠키에 리프레시 토큰
+        // 응답 설정
+        response.setHeader("access", access);
+        response.addCookie(cookieUtils.createCookie("refresh", refresh));
 
-        // Redis에 임시 데이터가 있다면 신규 회원가입 진행
-        String redirectUrl = tempUserRepository.findById(username).isPresent()
-                ? frontUrl + "/signup"
-                : frontUrl;
-
-        response.sendRedirect(redirectUrl);
+        response.sendRedirect(frontUrl);
     }
 
 }

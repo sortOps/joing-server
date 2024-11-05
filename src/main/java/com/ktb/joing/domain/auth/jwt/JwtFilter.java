@@ -1,7 +1,6 @@
 package com.ktb.joing.domain.auth.jwt;
 
 import com.ktb.joing.domain.auth.cookie.CookieUtils;
-import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.auth.exception.AuthErrorCode;
 import com.ktb.joing.domain.auth.exception.InvalidJwtException;
 import jakarta.servlet.FilterChain;
@@ -15,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -104,20 +104,25 @@ public class JwtFilter extends OncePerRequestFilter {
                 requestUri.matches("^\\/oauth2(?:\\/.*)?$");
     }
 
+
     private void setAuthentication(String username, String role) {
-        CustomOAuth2User customOAuth2User = getUserDetails(username, role);
-        Authentication authentication = getAuthentication(customOAuth2User);
+        UserDetails userDetails = createUserDetails(username, role);
+        Authentication authentication = getAuthentication(userDetails);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     //스프링 시큐리티 인증 토큰 생성
-    private Authentication getAuthentication(CustomOAuth2User userDetails){
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    private Authentication getAuthentication(UserDetails userDetails){
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
     }
 
     // UserDetails 객체 생성
-    private CustomOAuth2User getUserDetails(String username, String role){
-        return (CustomOAuth2User) User.builder()
+    private UserDetails createUserDetails(String username, String role) {
+        return User.builder()
                 .username(username)
                 .password("")
                 .authorities(role)

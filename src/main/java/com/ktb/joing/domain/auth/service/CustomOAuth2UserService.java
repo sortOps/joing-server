@@ -53,6 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .profileImage(oAuth2Response.getProfileImage())
                     .socialId(oAuth2Response.getProviderId())
                     .socialProvider(SocialProvider.KAKAO)
+                    .role(Role.ROLE_USER)
                     .build();
 
             tempUserRepository.save(tempUser);
