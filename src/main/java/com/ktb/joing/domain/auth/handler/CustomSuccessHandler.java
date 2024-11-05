@@ -5,6 +5,7 @@ import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.auth.jwt.JwtUtil;
 
 import com.ktb.joing.domain.auth.jwt.TokenService;
+import com.ktb.joing.domain.auth.redis.TempUserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtUtil jwtUtil;
     private final CookieUtils cooKieUtils;
     private final TokenService tokenService;
+    private final TempUserRepository tempUserRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -54,7 +56,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //응답 설정
         response.setHeader("access", access); // 응답헤더에 엑세스 토큰
         response.addCookie(cooKieUtils.createCookie("refresh", refresh)); // 응답쿠키에 리프레시 토큰
-        response.sendRedirect(frontUrl);
+
+        // Redis에 임시 데이터가 있다면 신규 회원가입 진행
+        String redirectUrl = tempUserRepository.findById(username).isPresent()
+                ? frontUrl + "/signup"
+                : frontUrl;
+
+        response.sendRedirect(redirectUrl);
     }
 
 }

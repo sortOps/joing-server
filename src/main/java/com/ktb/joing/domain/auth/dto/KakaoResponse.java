@@ -1,5 +1,7 @@
 package com.ktb.joing.domain.auth.dto;
 
+import com.ktb.joing.domain.user.entity.SocialProvider;
+
 import java.util.Map;
 
 public class KakaoResponse implements OAuth2Response {
@@ -10,8 +12,8 @@ public class KakaoResponse implements OAuth2Response {
     }
 
     @Override
-    public String getProvider() {
-        return "kakao";
+    public SocialProvider getProvider() {
+        return SocialProvider.KAKAO;
     }
 
     @Override

@@ -4,7 +4,8 @@ import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.auth.dto.KakaoResponse;
 import com.ktb.joing.domain.auth.dto.OAuth2Response;
 import com.ktb.joing.domain.auth.dto.UserDto;
-import com.ktb.joing.domain.user.entity.ProductManager;
+import com.ktb.joing.domain.auth.redis.TempUser;
+import com.ktb.joing.domain.auth.redis.TempUserRepository;
 import com.ktb.joing.domain.user.entity.Role;
 import com.ktb.joing.domain.user.entity.SocialProvider;
 import com.ktb.joing.domain.user.entity.User;
@@ -17,14 +18,13 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final TempUserRepository tempUserRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -47,22 +47,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User existData = userRepository.findByUsername(username).orElse(null);
 
         if (existData == null) {
-            User user = ProductManager.builder() // ProductManager로 임시 저장(회원가입 로직 후 변경 예정)
-                    .username(username)
-                    .email(oAuth2Response.getEmail())
-                    .nickname(oAuth2Response.getName())
+            // Redis에 임시 사용자 정보 저장
+            TempUser tempUser = TempUser.builder()
+                    .id(username)
                     .profileImage(oAuth2Response.getProfileImage())
-                    .profileSetup(false)
-                    .role(Role.ROLE_USER)
                     .socialId(oAuth2Response.getProviderId())
                     .socialProvider(SocialProvider.KAKAO)
                     .build();
 
-            userRepository.save(user);
+            tempUserRepository.save(tempUser);
 
             UserDto userDto = new UserDto();
             userDto.setUsername(username);
             userDto.setName(oAuth2Response.getName());
+            userDto.setProvider(oAuth2Response.getProvider());
+            userDto.setProviderId(oAuth2Response.getProviderId());
+            userDto.setProfileImage(oAuth2Response.getProfileImage());
             userDto.setRole(Role.ROLE_USER);
 
             return new CustomOAuth2User(userDto);
@@ -76,7 +76,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             UserDto userDto = new UserDto();
             userDto.setUsername(existData.getUsername());
-            userDto.setName(oAuth2Response.getName());
+            userDto.setName(existData.getNickname());
+            userDto.setProvider(oAuth2Response.getProvider());
+            userDto.setProviderId(oAuth2Response.getProviderId());
+            userDto.setProfileImage(oAuth2Response.getProfileImage());
             userDto.setRole(existData.getRole());
 
             return new CustomOAuth2User(userDto);
