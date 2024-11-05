@@ -1,7 +1,7 @@
 package com.ktb.joing.domain.auth.jwt;
 
 import com.ktb.joing.domain.auth.exception.AuthErrorCode;
-import com.ktb.joing.domain.auth.exception.InvalidJwtException;
+import com.ktb.joing.domain.auth.exception.AuthException;
 import com.ktb.joing.domain.auth.redis.TempUser;
 import com.ktb.joing.domain.auth.redis.TempUserRepository;
 import com.ktb.joing.domain.user.entity.User;
@@ -37,10 +37,10 @@ public class TokenService {
     // 리프레시 토큰으로부터 새로운 액세스 토큰 생성
     public String createAccessToken(String refreshToken) {
         RefreshToken findRefreshToken = refreshTokenRepository.findById(refreshToken)
-                .orElseThrow(() -> new InvalidJwtException(AuthErrorCode.INVALID_JWT));
+                .orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_JWT));
 
         User user = userRepository.findByUsername(findRefreshToken.getUsername())
-                .orElseThrow(() -> new InvalidJwtException(AuthErrorCode.INVALID_JWT)); // 에러 바꾸기
+                .orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_FOUND));
 
 
         return jwtUtil.createAccessToken(
@@ -53,10 +53,10 @@ public class TokenService {
     // 임시 회원용 액세스 토큰 생성
     private String createTempAccessToken(String refreshToken) {
         RefreshToken findRefreshToken = refreshTokenRepository.findById(refreshToken)
-                .orElseThrow(() -> new InvalidJwtException(AuthErrorCode.INVALID_JWT));
+                .orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_JWT));
 
         TempUser tempUser =  tempUserRepository.findById(findRefreshToken.getUsername())
-                .orElseThrow(() -> new InvalidJwtException(AuthErrorCode.INVALID_JWT));
+                .orElseThrow(() -> new AuthException(AuthErrorCode.TEMP_USER_NOT_FOUND));
 
         return jwtUtil.createTempAccessToken(
                 "access",
@@ -68,7 +68,7 @@ public class TokenService {
     // 리프레시 토큰에서 username 추출
     private String getUsernameFromRefreshToken(String refreshToken) {
         RefreshToken findRefreshToken = refreshTokenRepository.findById(refreshToken)
-                .orElseThrow(() -> new InvalidJwtException(AuthErrorCode.INVALID_JWT));
+                .orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_JWT));
         return findRefreshToken.getUsername();
     }
 

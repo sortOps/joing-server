@@ -2,7 +2,7 @@ package com.ktb.joing.domain.auth.jwt;
 
 import com.ktb.joing.domain.auth.cookie.CookieUtils;
 import com.ktb.joing.domain.auth.exception.AuthErrorCode;
-import com.ktb.joing.domain.auth.exception.InvalidJwtException;
+import com.ktb.joing.domain.auth.exception.AuthException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -53,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
             // 2. Access 토큰 카테고리 검증
             if (accessToken != null && !jwtUtil.getCategoryFromToken(accessToken).equals("access")) {
                 log.error("Invalid access token category");
-                throw new InvalidJwtException(AuthErrorCode.INVALID_JWT);
+                throw new AuthException(AuthErrorCode.INVALID_JWT);
             }
 
             // 3. Access 토큰이 유효한 경우
