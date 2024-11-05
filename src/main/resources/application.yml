@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: joing
+  profiles:
+    active: dev
+  config:
+    import: 'optional:aws-parameterstore:/config/joing_${spring.profiles.active}/'
+
+app:
+  frontend:
+    url: ${frontend.url}
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

@@ -1,0 +1,17 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${jdbc.url}
+    username: ${jdbc.username}
+    password: ${jdbc.password}
+
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}
