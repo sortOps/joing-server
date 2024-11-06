@@ -1,10 +1,8 @@
 spring:
   application:
     name: joing
-  profiles:
-    active: dev
   config:
-    import: 'optional:aws-parameterstore:/config/joing_${spring.profiles.active}/'
+    import: 'optional:aws-parameterstore:/joing/be'
 
 app:
   frontend:
