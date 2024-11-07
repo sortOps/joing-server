@@ -6,7 +6,7 @@ spring:
       - database
       - security
   config:
-    import: 'optional:aws-parameterstore:/joing/be'
+    import: 'optional:aws-parameterstore:/joing/be/'
   cloud:
     aws:
       region:
