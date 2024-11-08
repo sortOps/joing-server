@@ -1,5 +1,6 @@
 package com.ktb.joing.domain.user.entity;
 
+import com.ktb.joing.domain.item.entity.Item;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -25,5 +26,6 @@ public class ProductManager extends User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteCategory> favoriteCategories = new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Item> items = new ArrayList<>();
 }
