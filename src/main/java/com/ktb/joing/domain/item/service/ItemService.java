@@ -94,4 +94,15 @@ public class ItemService {
                 .build();
     }
 
+    // 기획안 삭제
+    public void deleteItem(Long itemId, String username) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
+
+        if (!item.getUser().getUsername().equals(username)) {
+            throw new ItemException(ItemErrorCode.ITEM_NOT_AUTHORIZED);
+        }
+        itemRepository.delete(item);
+    }
+
 }
