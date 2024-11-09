@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ItemCreateResponse {
+public class ItemResponse {
     private Long id;
     private String title;
     private String content;
@@ -26,7 +26,7 @@ public class ItemCreateResponse {
     private LocalDateTime updatedDateTime;
 
     @Builder
-    public ItemCreateResponse(Item item) {
+    public ItemResponse(Item item) {
         this.id = item.getId();
         this.title = item.getTitle();
         this.content = item.getContent();
