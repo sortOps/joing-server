@@ -3,6 +3,7 @@ package com.ktb.joing.domain.item.entity;
 import com.ktb.joing.common.model.BaseTimeEntity;
 import com.ktb.joing.domain.user.entity.Category;
 import com.ktb.joing.domain.user.entity.MediaType;
+import com.ktb.joing.domain.user.entity.ProductManager;
 import com.ktb.joing.domain.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,6 +64,22 @@ public class Item extends BaseTimeEntity {
     @OneToOne(mappedBy = "item")
     private Summary summary;
 
+    public void addEtc(Etc etc) {
+        this.etcs.add(etc);
+        etc.setItem(this);
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user instanceof ProductManager) {
+            ((ProductManager) user).getItems().add(this);
+        }
+    }
+
+    public void setSummary(Summary summary) {
+        this.summary = summary;
+        summary.setItem(this);
+    }
 
     @Builder
     private Item(String title, String content, MediaType mediaType, int score,

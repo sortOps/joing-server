@@ -32,6 +32,10 @@ public class Summary {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    protected void setItem(Item item) {
+        this.item = item;
+    }
+
     @Builder
     public Summary(Long id, String title, String content, String keyword, Item item) {
         this.id = id;

@@ -32,6 +32,9 @@ public class Etc {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    public void setItem(Item item) {
+        this.item = item;
+    }
 
     @Builder
     public Etc(Long id, String name, String value, Item item) {
