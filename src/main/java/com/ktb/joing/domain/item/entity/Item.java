@@ -81,6 +81,18 @@ public class Item extends BaseTimeEntity {
         summary.setItem(this);
     }
 
+    public void update(String title, String content, MediaType mediaType, Category category) {
+        if (title != null) this.title = title;
+        if (content != null) this.content = content;
+        if (mediaType != null) this.mediaType = mediaType;
+        if (category != null) this.category = category;
+    }
+
+    public void updateEtcs(List<Etc> newEtcs) {
+        this.etcs.clear();
+        newEtcs.forEach(this::addEtc);
+    }
+
     @Builder
     private Item(String title, String content, MediaType mediaType, int score,
                  User user, Category category, List<Etc> etcs, Summary summary) {

@@ -1,7 +1,8 @@
 package com.ktb.joing.domain.item.service;
 
 import com.ktb.joing.domain.item.dto.request.ItemCreateRequest;
-import com.ktb.joing.domain.item.dto.response.ItemCreateResponse;
+import com.ktb.joing.domain.item.dto.request.ItemUpdateRequest;
+import com.ktb.joing.domain.item.dto.response.ItemResponse;
 import com.ktb.joing.domain.item.entity.Etc;
 import com.ktb.joing.domain.item.entity.Item;
 import com.ktb.joing.domain.item.exception.ItemErrorCode;
@@ -17,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,12 +30,12 @@ public class ItemService {
     private final UserRepository userRepository;
 
     // 기획안 생성
-    public ItemCreateResponse createItem(ItemCreateRequest request, String username) {
+    public ItemResponse createItem(ItemCreateRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
         if (!(user instanceof ProductManager)) {
-            throw new ItemException(ItemErrorCode.INVALID_USER_TYPE);  // 적절한 에러 코드 필요
+            throw new ItemException(ItemErrorCode.INVALID_USER_TYPE);
         }
 
         Item item = Item.builder()
@@ -55,8 +59,39 @@ public class ItemService {
         }
 
         Item savedItem = itemRepository.save(item);
-        return ItemCreateResponse.builder()
+        return ItemResponse.builder()
                 .item(savedItem)
                 .build();
     }
+
+    // 기획안 수정
+    public ItemResponse updateItem(Long itemId, ItemUpdateRequest request, String username) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
+
+        if (!item.getUser().getUsername().equals(username)) {
+            throw new ItemException(ItemErrorCode.ITEM_NOT_AUTHORIZED);
+        }
+
+        item.update(request.getTitle(),
+                request.getContent(),
+                request.getMediaType(),
+                request.getCategory());
+
+        if (request.getEtcs() != null) {
+            List<Etc> newEtcs = request.getEtcs().stream()
+                    .map(etcRequest -> Etc.builder()
+                            .name(etcRequest.getName())
+                            .value(etcRequest.getValue())
+                            .build())
+                    .collect(Collectors.toList());
+
+            item.updateEtcs(newEtcs);
+        }
+
+        return ItemResponse.builder()
+                .item(item)
+                .build();
+    }
+
 }
