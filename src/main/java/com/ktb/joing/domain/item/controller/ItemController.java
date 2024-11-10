@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,12 @@ public class ItemController {
             @Valid @RequestBody ItemCreateRequest request) {
 
         ItemResponse response = itemService.createItem(request, customOAuth2User.getUsername());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{itemId}")
+    public ResponseEntity<ItemResponse> getItem(@PathVariable Long itemId) {
+        ItemResponse response = itemService.getItem(itemId);
         return ResponseEntity.ok(response);
     }
 

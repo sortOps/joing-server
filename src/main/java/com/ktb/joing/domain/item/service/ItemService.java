@@ -64,6 +64,17 @@ public class ItemService {
                 .build();
     }
 
+    // 기획안 단 건 조회
+    @Transactional(readOnly = true)
+    public ItemResponse getItem(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
+
+        return ItemResponse.builder()
+                .item(item)
+                .build();
+    }
+
     // 기획안 수정
     public ItemResponse updateItem(Long itemId, ItemUpdateRequest request, String username) {
         Item item = itemRepository.findById(itemId)
