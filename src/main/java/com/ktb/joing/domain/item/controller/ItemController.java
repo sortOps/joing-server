@@ -3,6 +3,7 @@ package com.ktb.joing.domain.item.controller;
 import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.item.dto.request.ItemCreateRequest;
 import com.ktb.joing.domain.item.dto.request.ItemUpdateRequest;
+import com.ktb.joing.domain.item.dto.response.ItemRecentResponse;
 import com.ktb.joing.domain.item.dto.response.ItemResponse;
 import com.ktb.joing.domain.item.service.ItemService;
 import jakarta.validation.Valid;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,6 +39,13 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemResponse> getItem(@PathVariable Long itemId) {
         ItemResponse response = itemService.getItem(itemId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<ItemRecentResponse>> getRecentItems(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        List<ItemRecentResponse> response = itemService.getRecentItems(customOAuth2User.getUsername());
         return ResponseEntity.ok(response);
     }
 
