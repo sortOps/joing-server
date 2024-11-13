@@ -2,15 +2,19 @@ spring:
   application:
     name: joing
   profiles:
+    active: dev
     include:
       - database
       - security
   config:
-    import: 'optional:aws-parameterstore:/joing/be/'
+    import: 'optional:aws-parameterstore:/joing/be/${spring.profiles.active}/'
   cloud:
     aws:
       region:
         static: ap-northeast-2
+
+ai:
+  url: ${ai.url}
 
 app:
   frontend:
