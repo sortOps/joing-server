@@ -43,9 +43,11 @@ dependencies {
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	//webflux (WebClient)
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 	//swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
-
 
 	// spring cloud aws (aws parameter store)
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1")
