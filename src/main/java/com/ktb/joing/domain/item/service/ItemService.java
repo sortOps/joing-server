@@ -2,6 +2,7 @@ package com.ktb.joing.domain.item.service;
 
 import com.ktb.joing.domain.item.dto.request.ItemCreateRequest;
 import com.ktb.joing.domain.item.dto.request.ItemUpdateRequest;
+import com.ktb.joing.domain.item.dto.response.ItemRecentResponse;
 import com.ktb.joing.domain.item.dto.response.ItemResponse;
 import com.ktb.joing.domain.item.entity.Etc;
 import com.ktb.joing.domain.item.entity.Item;
@@ -18,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +65,35 @@ public class ItemService {
         return ItemResponse.builder()
                 .item(savedItem)
                 .build();
+    }
+
+    // 기획안 단 건 조회
+    @Transactional(readOnly = true)
+    public ItemResponse getItem(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
+
+        return ItemResponse.builder()
+                .item(item)
+                .build();
+    }
+
+    // 기획안 리스트 조회 - 특정 기획자 사용자의 최근 3개월 기획안 기록 조회
+    public List<ItemRecentResponse> getRecentItems(String username) {
+        LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+
+        List<Item> recentItems = itemRepository.findRecentItems(
+                username,
+                threeMonthsAgo
+        );
+
+        return recentItems.isEmpty()
+                ? Collections.emptyList()
+                : recentItems.stream()
+                .map(item -> ItemRecentResponse.builder()
+                        .item(item)
+                        .build())
+                .toList();
     }
 
     // 기획안 수정
