@@ -61,7 +61,7 @@ public class Item extends BaseTimeEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Etc> etcs = new ArrayList<>();
 
-    @OneToOne(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "item")
     private Summary summary;
 
     public void addEtc(Etc etc) {
