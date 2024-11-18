@@ -2,7 +2,9 @@ package com.ktb.joing.domain.item.controller;
 
 import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.item.dto.response.EvaluationResponse;
+import com.ktb.joing.domain.item.dto.response.SummaryView;
 import com.ktb.joing.domain.item.service.ItemEvaluationService;
+import com.ktb.joing.domain.item.service.ItemSummaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/items")
 public class ItemEvaluationController {
     private final ItemEvaluationService itemEvaluationService;
+    private final ItemSummaryService itemSummaryService;
 
     @GetMapping("/{itemId}/evaluation")
     public Mono<ResponseEntity<EvaluationResponse<?>>> requestEvaluation(
@@ -24,6 +27,15 @@ public class ItemEvaluationController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
 
         return itemEvaluationService.requestEvaluation(itemId, customOAuth2User.getUsername())
+                .map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/{itemId}/summary")
+    public Mono<ResponseEntity<SummaryView>> regenerateSummary(
+            @PathVariable Long itemId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+
+        return itemSummaryService.regenerateSummary(itemId, customOAuth2User.getUsername())
                 .map(ResponseEntity::ok);
     }
 }
