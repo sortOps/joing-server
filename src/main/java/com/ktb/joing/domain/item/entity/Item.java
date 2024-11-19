@@ -67,6 +67,11 @@ public class Item extends BaseTimeEntity {
         etc.setItem(this);
     }
 
+    public void setSummary(Summary summary) {
+        this.summary = summary;
+        summary.setItem(this);
+    }
+
     public void setProductManager(ProductManager productManager) {
         this.productManager = productManager;
         if (productManager != null) {
@@ -76,11 +81,6 @@ public class Item extends BaseTimeEntity {
 
     public void deleteProductManager() {
         this.productManager = null;
-    }
-
-    public void setSummary(Summary summary) {
-        this.summary = summary;
-        summary.setItem(this);
     }
 
     public void update(String title, String content, MediaType mediaType, Category category) {

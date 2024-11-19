@@ -67,14 +67,12 @@ public class UserService {
                 .role(Role.ROLE_USER)
                 .build();
 
-        List<FavoriteCategory> favoriteCategories = request.getFavoriteCategories().stream()
-                .map(category -> FavoriteCategory.builder()
-                        .user(user)
-                        .category(category)
-                        .build())
-                .toList();
-
-        user.getFavoriteCategories().addAll(favoriteCategories);
+        request.getFavoriteCategories().forEach(category -> {
+            FavoriteCategory favoriteCategory = FavoriteCategory.builder()
+                    .category(category)
+                    .build();
+            favoriteCategory.setProductManager(user);
+        });
 
         userRepository.save(user);
 

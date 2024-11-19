@@ -32,6 +32,13 @@ public class FavoriteCategory {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    public void setProductManager(ProductManager productManager) {
+        this.productManager = productManager;
+        if (productManager != null) {
+            productManager.getFavoriteCategories().add(this);
+        }
+    }
+
     @Builder
     public FavoriteCategory(ProductManager productManager, Category category) {
         this.productManager = productManager;
