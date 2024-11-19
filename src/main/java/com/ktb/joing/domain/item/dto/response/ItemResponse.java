@@ -20,7 +20,7 @@ public class ItemResponse {
     private MediaType mediaType;
     private int score;
     private Category category;
-    private String userName;
+    private String nickname;
     private List<EtcResponse> etcs;
     private LocalDateTime createdDateTime;
     private LocalDateTime updatedDateTime;
@@ -33,7 +33,7 @@ public class ItemResponse {
         this.mediaType = item.getMediaType();
         this.score = item.getScore();
         this.category = item.getCategory();
-        this.userName = item.getUser().getUsername();
+        this.nickname = item.getProductManager().getNickname();
         this.etcs = item.getEtcs().stream()
                 .map(etc -> EtcResponse.builder()
                         .etc(etc)

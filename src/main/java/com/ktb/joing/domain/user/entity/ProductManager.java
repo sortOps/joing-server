@@ -23,9 +23,14 @@ public class ProductManager extends User {
 
     //기획자가 삭제되면 해당 선호 카테고리도 삭제
     @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "productManager", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteCategory> favoriteCategories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @OneToMany(mappedBy = "productManager")
     private List<Item> items = new ArrayList<>();
+
+    public void delete() {
+        items.forEach(Item::deleteProductManager);
+    }
 }

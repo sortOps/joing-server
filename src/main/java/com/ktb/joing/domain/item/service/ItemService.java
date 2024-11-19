@@ -10,10 +10,7 @@ import com.ktb.joing.domain.item.exception.ItemErrorCode;
 import com.ktb.joing.domain.item.exception.ItemException;
 import com.ktb.joing.domain.item.repository.ItemRepository;
 import com.ktb.joing.domain.user.entity.ProductManager;
-import com.ktb.joing.domain.user.entity.User;
-import com.ktb.joing.domain.user.exception.UserErrorCode;
-import com.ktb.joing.domain.user.exception.UserException;
-import com.ktb.joing.domain.user.repository.UserRepository;
+import com.ktb.joing.domain.user.repository.ProductManagerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,16 +27,12 @@ import java.util.stream.Collectors;
 @Transactional
 public class ItemService {
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final ProductManagerRepository productManagerRepository;
 
     // 기획안 생성
     public ItemResponse createItem(ItemCreateRequest request, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        if (!(user instanceof ProductManager)) {
-            throw new ItemException(ItemErrorCode.INVALID_USER_TYPE);
-        }
+        ProductManager productManager = productManagerRepository.findByUsername(username)
+                .orElseThrow(() -> new ItemException(ItemErrorCode.INVALID_USER_TYPE));
 
         Item item = Item.builder()
                 .title(request.getTitle())
@@ -49,7 +42,7 @@ public class ItemService {
                 .category(request.getCategory())
                 .build();
 
-        item.setUser(user);
+        item.setProductManager(productManager);
 
         if (request.getEtcs() != null && !request.getEtcs().isEmpty()) {
             request.getEtcs().forEach(etcRequest -> {
@@ -101,7 +94,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
 
-        if (!item.getUser().getUsername().equals(username)) {
+        if (!item.getProductManager().getUsername().equals(username)) {
             throw new ItemException(ItemErrorCode.ITEM_NOT_AUTHORIZED);
         }
 
@@ -131,7 +124,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
 
-        if (!item.getUser().getUsername().equals(username)) {
+        if (!item.getProductManager().getUsername().equals(username)) {
             throw new ItemException(ItemErrorCode.ITEM_NOT_AUTHORIZED);
         }
         itemRepository.delete(item);

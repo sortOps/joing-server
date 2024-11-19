@@ -4,7 +4,6 @@ import com.ktb.joing.common.model.BaseTimeEntity;
 import com.ktb.joing.domain.user.entity.Category;
 import com.ktb.joing.domain.user.entity.MediaType;
 import com.ktb.joing.domain.user.entity.ProductManager;
-import com.ktb.joing.domain.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,12 +50,11 @@ public class Item extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private ProductManager productManager;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
-
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Etc> etcs = new ArrayList<>();
@@ -69,11 +67,15 @@ public class Item extends BaseTimeEntity {
         etc.setItem(this);
     }
 
-    public void setUser(User user) {
-        this.user = user;
-        if (user instanceof ProductManager) {
-            ((ProductManager) user).getItems().add(this);
+    public void setProductManager(ProductManager productManager) {
+        this.productManager = productManager;
+        if (productManager != null) {
+            productManager.getItems().add(this);
         }
+    }
+
+    public void deleteProductManager() {
+        this.productManager = null;
     }
 
     public void setSummary(Summary summary) {
@@ -95,12 +97,12 @@ public class Item extends BaseTimeEntity {
 
     @Builder
     private Item(String title, String content, MediaType mediaType, int score,
-                 User user, Category category, List<Etc> etcs, Summary summary) {
+                 ProductManager productManager, Category category, List<Etc> etcs, Summary summary) {
         this.title = title;
         this.content = content;
         this.mediaType = mediaType;
         this.score = score;
-        this.user = user;
+        this.productManager = productManager;
         this.category = category;
         this.etcs = etcs;
         this.summary = summary;
