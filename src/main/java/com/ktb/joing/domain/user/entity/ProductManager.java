@@ -30,7 +30,13 @@ public class ProductManager extends User {
     @OneToMany(mappedBy = "productManager")
     private List<Item> items = new ArrayList<>();
 
+    public void addFavoriteCategory(FavoriteCategory favoriteCategory) {
+        this.favoriteCategories.add(favoriteCategory);
+        favoriteCategory.setProductManager(this);
+    }
+
     public void delete() {
         items.forEach(Item::deleteProductManager);
     }
+
 }

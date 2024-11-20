@@ -15,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -71,7 +69,7 @@ public class UserService {
             FavoriteCategory favoriteCategory = FavoriteCategory.builder()
                     .category(category)
                     .build();
-            favoriteCategory.setProductManager(user);
+            user.addFavoriteCategory(favoriteCategory);
         });
 
         userRepository.save(user);
@@ -85,5 +83,5 @@ public class UserService {
             throw new UserException(UserErrorCode.DUPLICATED_NICKNAME);
         }
     }
-}
 
+}
