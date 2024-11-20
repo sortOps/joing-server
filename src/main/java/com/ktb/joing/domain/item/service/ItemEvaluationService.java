@@ -3,10 +3,8 @@ package com.ktb.joing.domain.item.service;
 import com.ktb.joing.common.util.webClient.ReactiveHttpService;
 import com.ktb.joing.domain.item.dto.request.ItemEvaluationRequest;
 import com.ktb.joing.domain.item.dto.response.EvaluationResponse;
-import com.ktb.joing.domain.item.dto.response.FeedbackView;
 import com.ktb.joing.domain.item.dto.response.ItemEvaluationResponse;
 import com.ktb.joing.domain.item.dto.response.ResponseType;
-import com.ktb.joing.domain.item.dto.response.SummaryView;
 import com.ktb.joing.domain.item.entity.Etc;
 import com.ktb.joing.domain.item.entity.Item;
 import com.ktb.joing.domain.item.exception.ItemErrorCode;
@@ -38,7 +36,7 @@ public class ItemEvaluationService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
 
-        if (!item.getUser().getUsername().equals(username)) {
+        if (!item.getProductManager().getUsername().equals(username)) {
             throw new ItemException(ItemErrorCode.ITEM_NOT_AUTHORIZED);
         }
 
@@ -61,10 +59,10 @@ public class ItemEvaluationService {
 
     private EvaluationResponse<?> convertToEvaluationResponse(ItemEvaluationResponse response) {
         if (response.getEvaluationResult() == 0) {
-            return new EvaluationResponse<FeedbackView>(ResponseType.FEEDBACK,
+            return new EvaluationResponse<>(ResponseType.FEEDBACK,
                     response.getFeedback().toView());
         } else {
-            return new EvaluationResponse<SummaryView>(ResponseType.SUMMARY,
+            return new EvaluationResponse<>(ResponseType.SUMMARY,
                     response.getSummary().toView());
         }
     }
