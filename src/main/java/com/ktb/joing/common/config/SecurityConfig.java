@@ -49,7 +49,7 @@ public class SecurityConfig {
         // 경로별 인가 작업
         http.securityMatcher("/**") // 모든 요청에 대해
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/", "/healthz", "/oauth2/**", "/login/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
