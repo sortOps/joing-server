@@ -36,7 +36,7 @@ public class ItemSummaryService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
 
-        if (!item.getUser().getUsername().equals(username)) {
+        if (!item.getProductManager().getUsername().equals(username)) {
             throw new ItemException(ItemErrorCode.ITEM_NOT_AUTHORIZED);
         }
 
