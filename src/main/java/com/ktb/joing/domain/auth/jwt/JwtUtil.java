@@ -21,8 +21,6 @@ public class JwtUtil {
     private final String SECRET_KEY;
     private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 6; //6시간
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14; //2주
-    private static final long TEMP_ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 30; // 30분
-    private static final long TEMP_REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24; // 24시간
 
     public JwtUtil(@Value("${spring.jwt.secret}") String secretKey) {
         this.SECRET_KEY = secretKey;
@@ -91,28 +89,4 @@ public class JwtUtil {
                 .signWith(getSigningKey()).compact();
     }
 
-    public String createTempAccessToken(String category, String username, String role) {
-        Date now = new Date();
-        Date expireDate = new Date(now.getTime() + TEMP_ACCESS_TOKEN_EXPIRATION_TIME);
-
-        return Jwts.builder()
-                .claim("category", category)
-                .claim("username", username)
-                .claim("role", role)
-                .issuedAt(now)
-                .expiration(expireDate)
-                .signWith(getSigningKey()).compact();
-    }
-
-    public String createTempRefreshToken(String category, String username, String role) {
-        Date now = new Date();
-        Date expireDate = new Date(now.getTime() + TEMP_REFRESH_TOKEN_EXPIRATION_TIME);
-        return Jwts.builder()
-                .claim("category", category)
-                .claim("username", username)
-                .claim("role", role)
-                .issuedAt(now)
-                .expiration(expireDate)
-                .signWith(getSigningKey()).compact();
-    }
 }
