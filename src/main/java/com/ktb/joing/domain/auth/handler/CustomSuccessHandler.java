@@ -5,7 +5,7 @@ import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.auth.jwt.JwtUtil;
 
 import com.ktb.joing.domain.auth.jwt.TokenService;
-import com.ktb.joing.domain.auth.repository.TempUserRepository;
+import com.ktb.joing.domain.auth.redis.TempUserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,8 +44,19 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        // 임시 데이터가 있다면 신규 회원가입 진행
+        // Redis에 임시 데이터가 있다면 신규 회원가입 진행
         if (tempUserRepository.findById(username).isPresent()) {
+            // 임시 회원용 토큰 생성
+            String access = jwtUtil.createTempAccessToken("access", username, role);
+            String refresh = jwtUtil.createTempRefreshToken("refresh", username, role);
+
+            // Refresh 토큰 저장
+            tokenService.saveRefreshToken(username, refresh);
+
+            // 응답 설정
+            response.setHeader("access", access);
+            response.addCookie(cookieUtils.createCookie("refresh", refresh));
+
             response.sendRedirect(frontUrl + "/signup");
             return;
         }
