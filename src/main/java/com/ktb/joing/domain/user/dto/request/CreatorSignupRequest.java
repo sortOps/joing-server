@@ -20,16 +20,14 @@ public class CreatorSignupRequest {
     @Email(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = "올바른 이메일 형식이 아닙니다")
     private String email;
 
-    private String channelId;
     private String channelUrl;
     private MediaType mediaType;
     private Category category;
 
     @Builder
-    public CreatorSignupRequest(String nickname, String email, String channelUrl, String channelId, MediaType mediaType, Category category) {
+    public CreatorSignupRequest(String nickname, String email, String channelUrl, MediaType mediaType, Category category) {
         this.nickname = nickname;
         this.email = email;
-        this.channelId = channelId;
         this.channelUrl = channelUrl;
         this.mediaType = mediaType;
         this.category = category;

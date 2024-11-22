@@ -50,7 +50,6 @@ public class SecurityConfig {
         http.securityMatcher("/**") // 모든 요청에 대해
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/healthz", "/oauth2/**", "/login/**").permitAll()
-                        .requestMatchers("/api/v1/user/signup/**").hasRole("ROLE_TEMP_USER")
                         .anyRequest().authenticated()
                 );
 

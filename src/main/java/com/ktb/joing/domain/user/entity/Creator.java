@@ -18,8 +18,6 @@ public class Creator extends User{
 
     private String channelUrl;
 
-    private String channelId;
-
     private Long maxViews;
 
     private Long minViews;
