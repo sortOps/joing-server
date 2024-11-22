@@ -1,12 +1,13 @@
 package com.ktb.joing.domain.user.service;
 
-import com.ktb.joing.domain.auth.redis.TempUser;
-import com.ktb.joing.domain.auth.redis.TempUserRepository;
+import com.ktb.joing.domain.auth.entity.TempUser;
+import com.ktb.joing.domain.auth.repository.TempUserRepository;
 import com.ktb.joing.domain.user.dto.request.CreatorSignupRequest;
 import com.ktb.joing.domain.user.dto.request.ProductManagerSignupRequest;
 import com.ktb.joing.domain.user.entity.*;
 import com.ktb.joing.domain.user.exception.UserException;
 import com.ktb.joing.domain.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ class UserServiceTest {
 
     private TempUser tempUser;
     private final String TEST_USERNAME = "KAKAO testSocialId"; // socialProvider + " " + socialId 형식
+    private HttpServletResponse response;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +66,7 @@ class UserServiceTest {
                 .build();
 
         // When
-        userService.creatorSignUp(TEST_USERNAME, request);
+        userService.creatorSignUp(TEST_USERNAME, request, response);
 
         // Then
         User savedUser = userRepository.findByUsername(TEST_USERNAME)
@@ -103,7 +105,7 @@ class UserServiceTest {
                 .build();
 
         // When
-        userService.productManagerSignUp(TEST_USERNAME, request);
+        userService.productManagerSignUp(TEST_USERNAME, request, response);
 
         // Then
         User savedUser = userRepository.findByUsername(TEST_USERNAME)
@@ -143,7 +145,7 @@ class UserServiceTest {
                 .build();
 
         // When & Then
-        assertThatThrownBy(() -> userService.creatorSignUp(nonExistentUsername, request))
+        assertThatThrownBy(() -> userService.creatorSignUp(nonExistentUsername, request, response))
                 .isInstanceOf(UserException.class)
                 .hasFieldOrPropertyWithValue("userErrorCode", TEMP_USER_NOT_FOUND);
     }
@@ -159,7 +161,7 @@ class UserServiceTest {
                 .nickname(duplicateNickname)
                 .email("first@test.com")
                 .build();
-        userService.creatorSignUp(TEST_USERNAME, firstRequest);
+        userService.creatorSignUp(TEST_USERNAME, firstRequest, response);
 
         // 두 번째 임시 유저 생성
         String secondUsername = "KAKAO testSocialId2";
@@ -179,7 +181,7 @@ class UserServiceTest {
                 .build();
 
         // When & Then
-        assertThatThrownBy(() -> userService.creatorSignUp(secondUsername, secondRequest))
+        assertThatThrownBy(() -> userService.creatorSignUp(secondUsername, secondRequest, response))
                 .isInstanceOf(UserException.class)
                 .hasFieldOrPropertyWithValue("userErrorCode", DUPLICATED_NICKNAME);
     }
