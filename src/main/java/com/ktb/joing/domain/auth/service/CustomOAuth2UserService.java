@@ -4,8 +4,8 @@ import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.auth.dto.KakaoResponse;
 import com.ktb.joing.domain.auth.dto.OAuth2Response;
 import com.ktb.joing.domain.auth.dto.UserDto;
-import com.ktb.joing.domain.auth.redis.TempUser;
-import com.ktb.joing.domain.auth.redis.TempUserRepository;
+import com.ktb.joing.domain.auth.entity.TempUser;
+import com.ktb.joing.domain.auth.repository.TempUserRepository;
 import com.ktb.joing.domain.user.entity.Role;
 import com.ktb.joing.domain.user.entity.SocialProvider;
 import com.ktb.joing.domain.user.entity.User;
@@ -47,13 +47,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User existData = userRepository.findByUsername(username).orElse(null);
 
         if (existData == null) {
-            // Redis에 임시 사용자 정보 저장
             TempUser tempUser = TempUser.builder()
                     .id(username)
                     .profileImage(oAuth2Response.getProfileImage())
                     .socialId(oAuth2Response.getProviderId())
                     .socialProvider(SocialProvider.KAKAO)
-                    .role(Role.ROLE_USER)
+                    .role(Role.ROLE_TEMP_USER)
                     .build();
 
             tempUserRepository.save(tempUser);
@@ -64,7 +63,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userDto.setProvider(oAuth2Response.getProvider());
             userDto.setProviderId(oAuth2Response.getProviderId());
             userDto.setProfileImage(oAuth2Response.getProfileImage());
-            userDto.setRole(Role.ROLE_USER);
+            userDto.setRole(Role.ROLE_TEMP_USER);
 
             return new CustomOAuth2User(userDto);
         }
