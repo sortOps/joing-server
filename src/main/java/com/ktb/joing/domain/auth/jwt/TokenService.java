@@ -2,8 +2,8 @@ package com.ktb.joing.domain.auth.jwt;
 
 import com.ktb.joing.domain.auth.exception.AuthErrorCode;
 import com.ktb.joing.domain.auth.exception.AuthException;
-import com.ktb.joing.domain.auth.redis.TempUser;
-import com.ktb.joing.domain.auth.redis.TempUserRepository;
+import com.ktb.joing.domain.auth.entity.TempUser;
+import com.ktb.joing.domain.auth.repository.TempUserRepository;
 import com.ktb.joing.domain.user.entity.User;
 import com.ktb.joing.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;

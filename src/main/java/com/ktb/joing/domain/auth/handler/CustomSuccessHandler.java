@@ -5,7 +5,7 @@ import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.auth.jwt.JwtUtil;
 
 import com.ktb.joing.domain.auth.jwt.TokenService;
-import com.ktb.joing.domain.auth.redis.TempUserRepository;
+import com.ktb.joing.domain.auth.repository.TempUserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

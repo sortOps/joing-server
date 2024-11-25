@@ -1,7 +1,7 @@
 package com.ktb.joing.domain.user.service;
 
-import com.ktb.joing.domain.auth.redis.TempUser;
-import com.ktb.joing.domain.auth.redis.TempUserRepository;
+import com.ktb.joing.domain.auth.entity.TempUser;
+import com.ktb.joing.domain.auth.repository.TempUserRepository;
 import com.ktb.joing.domain.user.dto.request.CreatorSignupRequest;
 import com.ktb.joing.domain.user.dto.request.ProductManagerSignupRequest;
 import com.ktb.joing.domain.user.entity.*;
@@ -45,7 +45,7 @@ class UserServiceTest {
                 .socialId("testSocialId")
                 .socialProvider(SocialProvider.KAKAO)
                 .profileImage("http://profile.image")
-                .role(Role.ROLE_USER)
+                .role(Role.ROLE_TEMP_USER)
                 .build();
 
         tempUserRepository.save(tempUser);
@@ -168,7 +168,7 @@ class UserServiceTest {
                 .socialId("testSocialId2")
                 .socialProvider(SocialProvider.KAKAO)
                 .profileImage("http://profile.image")
-                .role(Role.ROLE_USER)
+                .role(Role.ROLE_TEMP_USER)
                 .build();
         tempUserRepository.save(secondTempUser);
 
