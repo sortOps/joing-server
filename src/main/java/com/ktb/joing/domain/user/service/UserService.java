@@ -38,6 +38,7 @@ public class UserService {
                 .role(Role.ROLE_USER)
                 .socialId(tempUser.getSocialId())
                 .socialProvider(tempUser.getSocialProvider())
+                .channelId(request.getChannelId())
                 .channelUrl(request.getChannelUrl())
                 .mediaType(request.getMediaType())
                 .category(request.getCategory())

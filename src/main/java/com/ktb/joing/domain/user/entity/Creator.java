@@ -16,6 +16,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Creator extends User{
 
+    private String channelId;
+
     private String channelUrl;
 
     private Long maxViews;
