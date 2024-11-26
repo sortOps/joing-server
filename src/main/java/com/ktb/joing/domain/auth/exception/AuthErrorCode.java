@@ -12,6 +12,7 @@ public enum AuthErrorCode implements ErrorCode {
     // Auth Error
     OAUTH2_LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "로그인 실패"),
     INVALID_JWT(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"),
     TEMP_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "임시 사용자 정보를 찾을 수 없습니다"),
     HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "권한이 없습니다"),

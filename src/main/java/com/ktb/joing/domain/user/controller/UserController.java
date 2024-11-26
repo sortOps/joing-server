@@ -37,4 +37,5 @@ public class UserController {
         userService.productManagerSignUp(customOAuth2User.getUsername(), productManagerSignupRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 }

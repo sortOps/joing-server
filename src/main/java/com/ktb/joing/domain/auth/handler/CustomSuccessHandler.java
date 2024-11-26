@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -35,44 +36,54 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        //유저 정보
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
         String username = customUserDetails.getUsername();
+        String role = extractRole(authentication);
 
+        String targetUrl = determineTargetUrl(username, role, response);
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    // 인증 객체에서 역할 정보를 추출
+    private String extractRole(Authentication authentication) {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
+        return auth.getAuthority();
+    }
 
-        // Redis에 임시 데이터가 있다면 신규 회원가입 진행
+    // 사용자 상태에 따라 적절한 리다이렉트 URL 결정
+    private String determineTargetUrl(String username, String role, HttpServletResponse response) {
         if (tempUserRepository.findById(username).isPresent()) {
-            // 임시 회원용 토큰 생성
-            String access = jwtUtil.createTempAccessToken("access", username, role);
-            String refresh = jwtUtil.createTempRefreshToken("refresh", username, role);
-
-            // Refresh 토큰 저장
-            tokenService.saveRefreshToken(username, refresh);
-
-            // 응답 설정
-            response.setHeader("access", access);
-            response.addCookie(cookieUtils.createCookie("refresh", refresh));
-
-            response.sendRedirect(frontUrl + "/signup");
-            return;
+            return createSignupRedirectUrl(username, role, response);
         }
+        return createMainRedirectUrl(username, role, response);
+    }
 
-        // 정상 회원용 토큰 생성
-        String access = jwtUtil.createAccessToken("access", username, role);
-        String refresh = jwtUtil.createRefreshToken("refresh", username, role);
-
-        // Refresh 토큰 저장
+    // 회원가입 페이지로의 리다이렉트 URL 생성
+    private String createSignupRedirectUrl(String username, String role, HttpServletResponse response) {
+        String access = jwtUtil.createTempAccessToken("access", username, role);
+        String refresh = jwtUtil.createTempRefreshToken("refresh", username, role);
         tokenService.saveRefreshToken(username, refresh);
-
-        // 응답 설정
-        response.setHeader("access", access);
         response.addCookie(cookieUtils.createCookie("refresh", refresh));
 
-        response.sendRedirect(frontUrl);
+        return UriComponentsBuilder.fromUriString(frontUrl + "/signup")
+                .queryParam("token", access)
+                .build()
+                .toUriString();
+    }
+
+    // 메인 페이지로의 리다이렉트 URL 생성
+    private String createMainRedirectUrl(String username, String role, HttpServletResponse response) {
+        String access = jwtUtil.createAccessToken("access", username, role);
+        String refresh = jwtUtil.createRefreshToken("refresh", username, role);
+        tokenService.saveRefreshToken(username, refresh);
+        response.addCookie(cookieUtils.createCookie("refresh", refresh));
+
+        return UriComponentsBuilder.fromUriString(frontUrl)
+                .queryParam("token", access)
+                .build()
+                .toUriString();
     }
 
 }
