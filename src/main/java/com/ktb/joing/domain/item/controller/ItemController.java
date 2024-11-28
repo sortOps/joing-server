@@ -4,6 +4,7 @@ import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.item.dto.request.ItemCreateRequest;
 import com.ktb.joing.domain.item.dto.request.ItemUpdateRequest;
 import com.ktb.joing.domain.item.dto.response.ItemRecentResponse;
+import com.ktb.joing.domain.item.dto.response.ItemDetailResponse;
 import com.ktb.joing.domain.item.dto.response.ItemResponse;
 import com.ktb.joing.domain.item.service.ItemService;
 import jakarta.validation.Valid;
@@ -37,8 +38,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemResponse> getItem(@PathVariable Long itemId) {
-        ItemResponse response = itemService.getItem(itemId);
+    public ResponseEntity<ItemDetailResponse> getItem(@PathVariable Long itemId) {
+        ItemDetailResponse response = itemService.getItem(itemId);
         return ResponseEntity.ok(response);
     }
 
@@ -51,12 +52,12 @@ public class ItemController {
 
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemResponse> updateItem(
+    public ResponseEntity<ItemDetailResponse> updateItem(
             @PathVariable Long itemId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestBody ItemUpdateRequest request) {
 
-        ItemResponse response = itemService.updateItem(itemId, request, customOAuth2User.getUsername());
+        ItemDetailResponse response = itemService.updateItem(itemId, request, customOAuth2User.getUsername());
         return ResponseEntity.ok(response);
     }
 

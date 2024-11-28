@@ -3,6 +3,7 @@ package com.ktb.joing.domain.item.service;
 import com.ktb.joing.domain.item.dto.request.ItemCreateRequest;
 import com.ktb.joing.domain.item.dto.request.ItemUpdateRequest;
 import com.ktb.joing.domain.item.dto.response.ItemRecentResponse;
+import com.ktb.joing.domain.item.dto.response.ItemDetailResponse;
 import com.ktb.joing.domain.item.dto.response.ItemResponse;
 import com.ktb.joing.domain.item.entity.Etc;
 import com.ktb.joing.domain.item.entity.Item;
@@ -38,7 +39,6 @@ public class ItemService {
                 .title(request.getTitle())
                 .content(request.getContent())
                 .mediaType(request.getMediaType())
-                .score(0)
                 .category(request.getCategory())
                 .build();
 
@@ -62,11 +62,11 @@ public class ItemService {
 
     // 기획안 단 건 조회
     @Transactional(readOnly = true)
-    public ItemResponse getItem(Long itemId) {
+    public ItemDetailResponse getItem(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
 
-        return ItemResponse.builder()
+        return ItemDetailResponse.builder()
                 .item(item)
                 .build();
     }
@@ -90,7 +90,7 @@ public class ItemService {
     }
 
     // 기획안 수정
-    public ItemResponse updateItem(Long itemId, ItemUpdateRequest request, String username) {
+    public ItemDetailResponse updateItem(Long itemId, ItemUpdateRequest request, String username) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemErrorCode.ITEM_NOT_FOUND));
 
@@ -114,7 +114,7 @@ public class ItemService {
             item.updateEtcs(newEtcs);
         }
 
-        return ItemResponse.builder()
+        return ItemDetailResponse.builder()
                 .item(item)
                 .build();
     }
