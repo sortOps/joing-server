@@ -32,6 +32,70 @@ jobs:
     - name: Test with Gradle 8.9
       run: ./gradlew test
 
+    - name: Build Docker image
+      run: |
+        docker build -t joing-server:latest .
+        
+    - name: Verify container starts
+      env:
+        APP_PHASE: dev
+      run: |
+        docker run -d \
+        -e APP_PHASE=$APP_PHASE \
+        -v ~/.aws/credentials:/root/.aws/credentials:ro \
+        --name joing-server-test-container -p 8080:8080 joing-server:latest
+        
+        sleep 30
+
+        CONTAINER_STATUS=$(docker inspect joing-server-test-container --format='{{.State.Status}}')
+        echo "$CONTAINER_STATUS"
+        if [ "$CONTAINER_STATUS" != "running" ]; then
+          echo "Container failed to start. Status: $CONTAINER_STATUS"
+          docker logs joing-server-test-container
+          exit 1
+        fi
+        
+        HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/healthz || echo "failed")
+        echo "$HEALTH_CHECK"
+        if [ "$HEALTH_CHECK" != "200" ]; then
+          echo "Health check failed. Status code: $HEALTH_CHECK"
+          docker logs joing-server-test-container
+          exit 1
+        fi
+        
+        echo "Container successfully started ..."
+
+    - name: Send Discord Notification - Success
+      if: success()
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        title: "빌드 성공!!!"
+        description: |
+          **Branch**: ${{ github.ref_name }}
+          **Build Number**: ${{ github.run_number }}
+        color: 0x28A745 # Color Expression: 'GREEN'
+        username: JOING BOT
+
+    - name: Send Discord Notification - Failure
+      if: failure()
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        title: "빌드 실패..."
+        description: |
+          **Branch**: ${{ github.ref_name }}
+          **Build Number**: ${{ github.run_number }}
+          **Action URL**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        color: 0xDC3545 # Color Expression: 'RED'
+        username: JOING BOT
+
+    - name: Cleanup
+      if: always()
+      run: |
+        docker stop joing-server-test-container || true
+        docker rm joing-server-test-container || true
+
 
   dependency-submission:
 
