@@ -97,6 +97,27 @@ public class UserService {
                 ProductManagerResponse.builder().productManager((ProductManager) user).build());
     }
 
+    // 회원 정보 수정
+    public UserResponse<?> updateUser(String username, UserUpdateRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        if (request.getNickname() != null) {
+            validateDuplicateNickname(request.getNickname());
+        }
+
+        if (user instanceof Creator creator) {
+            creator.update(request);
+            return new UserResponse<>(UserType.CREATOR,
+                    CreatorResponse.builder().creator(creator).build());
+        }
+
+        ProductManager productManager = (ProductManager) user;
+        productManager.update(request);
+        return new UserResponse<>(UserType.PRODUCT_MANAGER,
+                ProductManagerResponse.builder().productManager(productManager).build());
+    }
+
     // 닉네임 중복 확인
     private void validateDuplicateNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
