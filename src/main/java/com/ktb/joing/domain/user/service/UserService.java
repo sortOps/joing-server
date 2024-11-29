@@ -4,10 +4,16 @@ import com.ktb.joing.domain.auth.entity.TempUser;
 import com.ktb.joing.domain.auth.repository.TempUserRepository;
 import com.ktb.joing.domain.user.dto.request.CreatorSignupRequest;
 import com.ktb.joing.domain.user.dto.request.ProductManagerSignupRequest;
+import com.ktb.joing.domain.user.dto.request.UserUpdateRequest;
+import com.ktb.joing.domain.user.dto.response.CreatorResponse;
+import com.ktb.joing.domain.user.dto.response.ProductManagerResponse;
+import com.ktb.joing.domain.user.dto.response.UserResponse;
+import com.ktb.joing.domain.user.dto.response.UserType;
 import com.ktb.joing.domain.user.entity.Creator;
 import com.ktb.joing.domain.user.entity.FavoriteCategory;
 import com.ktb.joing.domain.user.entity.ProductManager;
 import com.ktb.joing.domain.user.entity.Role;
+import com.ktb.joing.domain.user.entity.User;
 import com.ktb.joing.domain.user.exception.UserErrorCode;
 import com.ktb.joing.domain.user.exception.UserException;
 import com.ktb.joing.domain.user.repository.UserRepository;
@@ -75,6 +81,20 @@ public class UserService {
         userRepository.save(user);
 
         tempUserRepository.deleteById(username);
+    }
+
+    // 회원 정보 조회
+    @Transactional(readOnly = true)
+    public UserResponse<?> getUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        if (user instanceof Creator) {
+            return new UserResponse<>(UserType.CREATOR,
+                    CreatorResponse.builder().creator((Creator) user).build());
+        }
+        return new UserResponse<>(UserType.PRODUCT_MANAGER,
+                ProductManagerResponse.builder().productManager((ProductManager) user).build());
     }
 
     // 닉네임 중복 확인

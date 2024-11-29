@@ -3,12 +3,15 @@ package com.ktb.joing.domain.user.controller;
 import com.ktb.joing.domain.auth.dto.CustomOAuth2User;
 import com.ktb.joing.domain.user.dto.request.CreatorSignupRequest;
 import com.ktb.joing.domain.user.dto.request.ProductManagerSignupRequest;
+import com.ktb.joing.domain.user.dto.response.CreatorResponse;
+import com.ktb.joing.domain.user.dto.response.UserResponse;
 import com.ktb.joing.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +39,12 @@ public class UserController {
 
         userService.productManagerSignUp(customOAuth2User.getUsername(), productManagerSignupRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<UserResponse<?>> getUserInfo(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        UserResponse<?> response = userService.getUser(customOAuth2User.getUsername());
+        return ResponseEntity.ok(response);
     }
 
 }
