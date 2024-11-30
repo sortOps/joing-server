@@ -12,4 +12,3 @@ public class UserException extends BusinessException {
         this.userErrorCode = userErrorCode;
     }
 }
-
