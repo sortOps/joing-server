@@ -1,6 +1,6 @@
 package com.ktb.joing.domain.item.service;
 
-import com.ktb.joing.common.util.webClient.ReactiveHttpService;
+import com.ktb.joing.domain.item.client.ItemAIClient;
 import com.ktb.joing.domain.item.dto.request.ItemEvaluationRequest;
 import com.ktb.joing.domain.item.dto.response.EvaluationResponse;
 import com.ktb.joing.domain.item.dto.response.ItemEvaluationResponse;
@@ -12,7 +12,6 @@ import com.ktb.joing.domain.item.exception.ItemException;
 import com.ktb.joing.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -25,11 +24,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class ItemEvaluationService {
 
-    @Value("${ai.url}")
-    private String aiUrl;
-
     private final ItemRepository itemRepository;
-    private final ReactiveHttpService reactiveHttpService;
+    private final ItemAIClient itemAIClient;
     private final ItemSummaryService itemSummaryService;
 
     public Mono<EvaluationResponse<?>> requestEvaluation(Long itemId, String username) {
@@ -42,18 +38,13 @@ public class ItemEvaluationService {
 
         ItemEvaluationRequest request = createEvaluationRequest(item);
 
-        return reactiveHttpService.post(
-                        aiUrl + "/ai/evaluation/proposal",
-                        request,
-                        ItemEvaluationResponse.class
-                )
+        return itemAIClient.requestEvaluation(request)
                 .doOnSuccess(response -> {
                     if (response.getEvaluationResult() == 1) {
                         itemSummaryService.updateItemSummary(item, response.getSummary());
                     }
                 })
                 .<EvaluationResponse<?>>map(this::convertToEvaluationResponse)
-                .doOnError(e -> log.error("AI 평가 요청 실패: {}", e.getMessage()))
                 .onErrorMap(e -> new ItemException(ItemErrorCode.AI_EVALUATION_FAILED));
     }
 

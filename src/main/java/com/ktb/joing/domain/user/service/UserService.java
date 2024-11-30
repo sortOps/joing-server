@@ -1,8 +1,8 @@
 package com.ktb.joing.domain.user.service;
 
-import com.ktb.joing.common.util.webClient.ReactiveHttpService;
 import com.ktb.joing.domain.auth.entity.TempUser;
 import com.ktb.joing.domain.auth.repository.TempUserRepository;
+import com.ktb.joing.domain.user.client.ProfileAIClient;
 import com.ktb.joing.domain.user.dto.request.CreatorSignupRequest;
 import com.ktb.joing.domain.user.dto.request.ProductManagerSignupRequest;
 import com.ktb.joing.domain.user.dto.request.ProfileEvaluationRequest;
@@ -16,7 +16,6 @@ import com.ktb.joing.domain.user.exception.UserException;
 import com.ktb.joing.domain.user.repository.CreatorRepository;
 import com.ktb.joing.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,13 +27,10 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class UserService {
 
-    @Value("${ai.url}")
-    private String aiUrl;
-
     private final UserRepository userRepository;
     private final TempUserRepository tempUserRepository;
     private final CreatorRepository creatorRepository;
-    private final ReactiveHttpService reactiveHttpService;
+    private final ProfileAIClient profileAIClient;
 
     public void creatorSignUp(String username, CreatorSignupRequest request) {
         TempUser tempUser = tempUserRepository.findById(username)
@@ -105,12 +101,7 @@ public class UserService {
 
         ProfileEvaluationRequest request = creatorEvaluationRequest(creator);
 
-        return reactiveHttpService.post(
-                aiUrl + "/ai/profile/evaluation",
-                request,
-                ProfileEvaluationResponse.class
-        )
-        .doOnError(e -> log.error("Profile evaluation failed: {}", e.getMessage()))
+        return profileAIClient.profileEvaluation(request)
         .onErrorMap(e -> new UserException(UserErrorCode.PROFILE_EVALUATION_FAILED));
     }
 
