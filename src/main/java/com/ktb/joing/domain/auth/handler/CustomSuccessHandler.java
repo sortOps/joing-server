@@ -66,6 +66,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String refresh = jwtUtil.createTempRefreshToken("refresh", username, role);
         tokenService.saveRefreshToken(username, refresh);
         response.addCookie(cookieUtils.createCookie("refresh", refresh));
+        log.info("access token: {}", access);
+        log.info("refresh token: {}", refresh);
 
         return UriComponentsBuilder.fromUriString(frontUrl + "/signup")
                 .queryParam("token", access)
@@ -79,6 +81,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String refresh = jwtUtil.createRefreshToken("refresh", username, role);
         tokenService.saveRefreshToken(username, refresh);
         response.addCookie(cookieUtils.createCookie("refresh", refresh));
+        log.info("access token: {}", access);
+        log.info("refresh token: {}", refresh);
 
         return UriComponentsBuilder.fromUriString(frontUrl)
                 .queryParam("token", access)
