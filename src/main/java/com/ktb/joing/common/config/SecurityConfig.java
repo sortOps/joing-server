@@ -69,7 +69,7 @@ public class SecurityConfig {
         http.securityMatcher("/**") // 모든 요청에 대해
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/healthz", "/oauth2/**", "/login/**").permitAll()
-                        .requestMatchers("/api/v1/users/signup/**").hasRole("TEMP_USER")
+                        .requestMatchers("/signup/**", "/api/v1/users/signup/**").hasRole("TEMP_USER")
                         .anyRequest().authenticated()
                 );
 
