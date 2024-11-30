@@ -99,16 +99,10 @@ public class UserService {
         Creator creator = creatorRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.TEMP_USER_NOT_FOUND));
 
-        ProfileEvaluationRequest request = creatorEvaluationRequest(creator);
+        ProfileEvaluationRequest request = new ProfileEvaluationRequest(creator.getChannelId());
 
         return profileAIClient.profileEvaluation(request)
         .onErrorMap(e -> new UserException(UserErrorCode.PROFILE_EVALUATION_FAILED));
-    }
-
-    private ProfileEvaluationRequest creatorEvaluationRequest(Creator creator){
-        return ProfileEvaluationRequest.builder()
-                .channelId(creator.getChannelId())
-                .build();
     }
 
 }
