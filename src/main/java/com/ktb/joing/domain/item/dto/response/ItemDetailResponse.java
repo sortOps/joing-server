@@ -17,6 +17,7 @@ public class ItemDetailResponse {
     private Long id;
     private String nickname;
     private String email;
+    private String profileImage;
     private String title;
     private String content;
     private MediaType mediaType;
@@ -29,6 +30,7 @@ public class ItemDetailResponse {
         this.id = item.getId();
         this.nickname = item.getProductManager().getNickname();
         this.email = item.getProductManager().getEmail();
+        this.profileImage = item.getProductManager().getProfileImage();
         this.title = item.getTitle();
         this.content = item.getContent();
         this.mediaType = item.getMediaType();
